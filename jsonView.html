@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>JSON viewer</title>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css" rel="stylesheet">
+	<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+</head>
+<body>
+<table>
+	<tr>
+		<td>
+<textarea rows="38" cols="85" id="editor" onchange="update()">
+{
+	"name": "zhangxx2015",
+	"url": "https://github.com/zhangxx2015",
+	"address": {
+		"street": "海淀区景天路",
+		"city": "北京",
+		"country": "中国"
+	},
+	"links": [
+		{
+			"name": "feather",
+			"url": "https://github.com/zhangxx2015/feather"
+		},
+		{
+			"name": "tiny script interpreter",
+			"url": "https://github.com/zhangxx2015/tiny-only-255-lines-of-code-script-interpreter-scanner-executer-"
+		},
+		{
+			"name": "UniversalReport",
+			"url": "https://github.com/zhangxx2015/UniversalReport"
+		}
+	]
+}
+</textarea>
+		</td>
+		<td>
+<div style="width:800px;height:780px;overflow-x:auto;overflow-y:auto">
+	<div id="tree"></div>
+</div>
+		</td>
+	</tr>
+</table>
+<script>
+function update(){
+	Math.guid = function () {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+			var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+			return v.toString(16);
+		}).toString();
+	}
+	let obj=JSON.parse(document.getElementById('editor').value);
+	function parseObjs(objs) {
+		let nodes=[];
+		Object.keys(objs).forEach(function(key){
+			if((objs[key] instanceof Array)){
+				let parN={"text": key};
+				parN.nodes= parseObjs(objs[key]);
+				nodes.push(parN);
+			}else if((objs[key] instanceof Object)){
+				let parN={"text": key};
+				parN.nodes = parseObjs(objs[key]);
+				nodes.push(parN);
+			}else{
+				let id=Math.guid();
+				let node={"text": `<span style="white-space:nowrap;display:inline-block;">${key} ： <input id="${id}" value="${objs[key]}" placeholder="${key}" style="width:400px;" type="text" class="form-control" /></span>`};
+				nodes.push(node);
+			}
+		});
+		return nodes;
+	}
+	$('#tree').treeview({data: parseObjs(obj)});
+}
+$(function(){update();});
+</script>
+</body>
+</html>
